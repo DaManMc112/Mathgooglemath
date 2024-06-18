@@ -3,11 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Very god
-    </title>
-   
+    <title>Win guess the word!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+          background-color:black;
+          color:white;
+        }
+        #timer {
+            font-size: 2em;
+        }
+        #word-display {
+            font-size: 2em;
+            margin: 20px 0;
+        }
+        #message {
+            font-size: 1.5em;
+            color: green;
+        }
+        #death-message {
+            font-size: 1.5em;
+            color: red;
+        }
+    </style>
 </head>
 <body>
-   
+    <h1>Guess the Word Game</h1>
+    <div id="timer">02:00</div>
+    <div id="word-display">_ _ _ _ _</div>
+    <input type="text" id="guess-input" placeholder="Enter your guess">
+    <button onclick="checkGuess()">Guess</button>
+    <div id="message"></div>
+    <div id="death-message"></div>
+
+    <script src="script.js"></script>
 </body>
+  <script>
+    const words = ["apple", "banana", "cherry", "date", "elderberry", "fig", "grape"];
+let currentWord = "";
+let timer;
+let timeLeft = 120; // 2 minutes in seconds
+
+function startGame() {
+    currentWord = words[Math.floor(Math.random() * words.length)];
+    document.getElementById("word-display").textContent = "_ ".repeat(currentWord.length).trim();
+    document.getElementById("message").textContent = "";
+    document.getElementById("death-message").textContent = "";
+    timeLeft = 120;
+    updateTimer();
+    timer = setInterval(updateTimer, 1000);
+}
+
+function updateTimer() {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    document.getElementById("timer").textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    timeLeft--;
+
+    if (timeLeft < 0) {
+        clearInterval(timer);
+        document.getElementById("death-message").textContent = "You died! Time's up.";
+        setTimeout(startGame, 2000);
+    }
+}
+
+function checkGuess() {
+    const guess = document.getElementById("guess-input").value.toLowerCase();
+    if (guess === currentWord) {
+        clearInterval(timer);
+        document.getElementById("message").textContent = `Congratulations! You guessed the word: ${currentWord}`;
+        setTimeout(startGame, 2000);
+    } else {
+        document.getElementById("message").textContent = "Wrong guess! Try again.";
+    }
+    document.getElementById("guess-input").value = "";
+}
+
+window.onload = startGame;
+
+    
+    
+    </script>
 </html>
