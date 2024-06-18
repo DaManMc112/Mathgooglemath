@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Win guess the word!</title>
+    <title>Guess the Word Game</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             padding: 50px;
-          background-color:black;
-          color:white;
+            background-color: black;
+            color: white;
         }
         #timer {
             font-size: 2em;
@@ -41,19 +41,27 @@
     <script src="script.js"></script>
 </body>
   <script>
-    const words = ["apple", "banana", "cherry", "date", "elderberry", "fig", "grape"];
+    const words = ["apple", "banana", "cherry", "date", "elderberry", "fig", "grape", "honeydew", "kiwi", "lemon", "mango", "nectarine", "orange", "papaya", "quince", "raspberry", "strawberry", "tangerine", "ugli", "watermelon"];
 let currentWord = "";
+let displayedWord = "";
 let timer;
 let timeLeft = 120; // 2 minutes in seconds
+let hintInterval;
 
 function startGame() {
     currentWord = words[Math.floor(Math.random() * words.length)];
-    document.getElementById("word-display").textContent = "_ ".repeat(currentWord.length).trim();
+    displayedWord = "_".repeat(currentWord.length);
+    updateDisplayedWord();
     document.getElementById("message").textContent = "";
     document.getElementById("death-message").textContent = "";
     timeLeft = 120;
     updateTimer();
     timer = setInterval(updateTimer, 1000);
+    hintInterval = setInterval(revealHint, 30000); // reveal a hint every 30 seconds
+}
+
+function updateDisplayedWord() {
+    document.getElementById("word-display").textContent = displayedWord.split("").join(" ");
 }
 
 function updateTimer() {
@@ -64,8 +72,19 @@ function updateTimer() {
 
     if (timeLeft < 0) {
         clearInterval(timer);
+        clearInterval(hintInterval);
         document.getElementById("death-message").textContent = "You died! Time's up.";
         setTimeout(startGame, 2000);
+    }
+}
+
+function revealHint() {
+    for (let i = 0; i < currentWord.length; i++) {
+        if (displayedWord[i] === "_") {
+            displayedWord = displayedWord.substr(0, i) + currentWord[i] + displayedWord.substr(i + 1);
+            updateDisplayedWord();
+            return;
+        }
     }
 }
 
@@ -73,12 +92,23 @@ function checkGuess() {
     const guess = document.getElementById("guess-input").value.toLowerCase();
     if (guess === currentWord) {
         clearInterval(timer);
+        clearInterval(hintInterval);
         document.getElementById("message").textContent = `Congratulations! You guessed the word: ${currentWord}`;
         setTimeout(startGame, 2000);
     } else {
         document.getElementById("message").textContent = "Wrong guess! Try again.";
+        updateDisplayedWordWithCorrectLetters(guess);
     }
     document.getElementById("guess-input").value = "";
+}
+
+function updateDisplayedWordWithCorrectLetters(guess) {
+    for (let i = 0; i < currentWord.length; i++) {
+        if (guess[i] === currentWord[i]) {
+            displayedWord = displayedWord.substr(0, i) + currentWord[i] + displayedWord.substr(i + 1);
+        }
+    }
+    updateDisplayedWord();
 }
 
 window.onload = startGame;
